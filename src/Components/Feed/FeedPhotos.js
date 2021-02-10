@@ -6,16 +6,24 @@ import Loading from '../Helpers/Loading';
 import FeedPhotosItem from './FeedPhotosItem';
 import styles from './FeedPhotos.module.css';
 
-const FeedPhotos = ({ setModalPhoto }) => {
+const FeedPhotos = ({ page, user, setModalPhoto, setBuscarMaisPaginas }) => {
     const { data, request, loading, error } = useFetch();
 
     React.useEffect(() => {
         async function fetchPhotos() {
-            const { url, options } = PHOTOS_GET({ page: 1, total: 6, user: 0 });
+            const totalDeItens = 10;
+            const { url, options } = PHOTOS_GET({
+                page,
+                total: totalDeItens,
+                user,
+            });
             const { response, json } = await request(url, options);
+            if (response && response.ok && json.length < totalDeItens) {
+                setBuscarMaisPaginas(false);
+            }
         }
         fetchPhotos();
-    }, [request]);
+    }, [request, user, page, setBuscarMaisPaginas]);
 
     if (error) {
         return <Error message={error} />;
